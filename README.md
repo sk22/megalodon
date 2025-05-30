@@ -1,3 +1,9 @@
+> ### **Not to be confused with [Megalodon](https://github.com/h3poteto/megalodon), the Fediverse API client library for JavaScript**
+
+> ### This project has been abandoned. You may want to migrate to [Moshidon](https://github.com/LucasGGamerM/moshidon) (a fork of Megalodon) or a different Mastodon app.
+
+---
+
 ![Pink logo with pink shark](mastodon/src/main/res/mipmap-xhdpi/ic_launcher_round.png)
 
 # Megalodon

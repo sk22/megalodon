@@ -151,7 +151,7 @@ public abstract class StatusDisplayItem{
 				: fragment.getString(R.string.in_reply_to, account.getDisplayName());
 		return new ReblogOrReplyLineStatusDisplayItem(
 				parentID, fragment, text, account == null ? List.of() : account.emojis,
-				R.drawable.ic_fluent_arrow_reply_20sp_filled, null, null, fullText, status
+				R.drawable.ic_fluent_arrow_reply_20sp_filled, null, null, fullText, status, account
 		);
 	}
 
@@ -182,7 +182,7 @@ public abstract class StatusDisplayItem{
 				items.add(new ReblogOrReplyLineStatusDisplayItem(parentID, fragment, text, status.account.emojis, R.drawable.ic_fluent_arrow_repeat_all_20sp_filled, isOwnPost ? status.visibility : null, i->{
 					args.putParcelable("profileAccount", Parcels.wrap(status.account));
 					Nav.go(fragment.getActivity(), ProfileFragment.class, args);
-				}, null, status));
+				}, null, status, status.account));
 			} else if (!(status.tags.isEmpty() ||
 					fragment instanceof HashtagTimelineFragment ||
 					fragment instanceof ListTimelineFragment

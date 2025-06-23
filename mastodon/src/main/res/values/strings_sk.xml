@@ -365,6 +365,10 @@
     <string name="sk_settings_show_emoji_reactions_hide_empty">Hide empty emoji reactions</string>
     <string name="sk_settings_show_emoji_reactions_only_opened">Only when post is opened</string>
     <string name="sk_settings_show_emoji_reactions_always">Always show add button</string>
+    <string name="sk_settings_new_emoji_reaction_button">New emoji reaction button</string>
+    <string name="sk_settings_new_emoji_reaction_button_with_reactions">With reactions</string>
+    <string name="sk_settings_new_emoji_reaction_button_replace_bookmark">Replace bookmark button</string>
+    <string name="sk_settings_new_emoji_reaction_button_replace_share">Replace share button</string>
     <plurals name="sk_users_reacted_with">
         <item quantity="one">One user reacted with %2$s</item>
         <item quantity="other">%1$,d users reacted with %2$s</item>

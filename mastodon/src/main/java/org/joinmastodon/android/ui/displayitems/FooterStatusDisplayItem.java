@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,17 +17,21 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.joinmastodon.android.GlobalUserPreferences;
 import org.joinmastodon.android.R;
+import org.joinmastodon.android.api.session.AccountLocalPreferences;
 import org.joinmastodon.android.api.session.AccountSession;
 import org.joinmastodon.android.api.session.AccountSessionManager;
 import org.joinmastodon.android.fragments.BaseStatusListFragment;
 import org.joinmastodon.android.fragments.ComposeFragment;
+import org.joinmastodon.android.model.Emoji;
 import org.joinmastodon.android.model.Instance;
 import org.joinmastodon.android.model.Status;
 import org.joinmastodon.android.model.StatusPrivacy;
+import org.joinmastodon.android.ui.CustomEmojiPopupKeyboard;
 import org.joinmastodon.android.ui.M3AlertDialogBuilder;
 import org.joinmastodon.android.ui.utils.UiUtils;
 import org.parceler.Parcels;
@@ -52,10 +57,12 @@ public class FooterStatusDisplayItem extends StatusDisplayItem{
 		return Type.FOOTER;
 	}
 
-	public static class Holder extends StatusDisplayItem.Holder<FooterStatusDisplayItem>{
+	public static class Holder extends StatusDisplayItem.Holder<FooterStatusDisplayItem> implements CustomEmojiPopupKeyboard.Listener {
 		private final TextView replies, boosts, favorites;
-		private final View reply, boost, favorite, share, bookmark;
+		private final View reply, boost, favorite, share, bookmark, react;
 		private final ImageView favIcon;
+		private CustomEmojiPopupKeyboard emojiKeyboard;
+		private final LinearLayout emojiKeyboardContainer;
 
 		private View touchingView = null;
 		private boolean longClickPerformed = false;
@@ -83,12 +90,15 @@ public class FooterStatusDisplayItem extends StatusDisplayItem{
 			boosts=findViewById(R.id.boost);
 			favorites=findViewById(R.id.favorite);
 
+			emojiKeyboardContainer = findViewById(R.id.footer_emoji_keyboard_container);
+
 			reply=findViewById(R.id.reply_btn);
 			boost=findViewById(R.id.boost_btn);
 			favorite=findViewById(R.id.favorite_btn);
 			share=findViewById(R.id.share_btn);
 			bookmark=findViewById(R.id.bookmark_btn);
 			favIcon=findViewById(R.id.favorite_icon);
+			react=findViewById(R.id.react_btn);
 
 			reply.setOnTouchListener(this::onButtonTouch);
 			reply.setOnClickListener(this::onReplyClick);
@@ -106,6 +116,9 @@ public class FooterStatusDisplayItem extends StatusDisplayItem{
 			bookmark.setOnClickListener(this::onBookmarkClick);
 			bookmark.setOnLongClickListener(this::onBookmarkLongClick);
 			bookmark.setAccessibilityDelegate(buttonAccessibilityDelegate);
+			react.setOnTouchListener(this::onButtonTouch);
+			react.setOnClickListener(this::onReactClick);
+			react.setAccessibilityDelegate(buttonAccessibilityDelegate);
 			share.setOnTouchListener(this::onButtonTouch);
 			share.setOnClickListener(this::onShareClick);
 			share.setOnLongClickListener(this::onShareLongClick);
@@ -144,6 +157,42 @@ public class FooterStatusDisplayItem extends StatusDisplayItem{
 					condenseBottom ? V.dp(-5) : 0);
 
 			itemView.requestLayout();
+
+			AccountSession session = AccountSessionManager.getInstance().getAccount(item.accountID);
+			if(!session.getLocalPreferences().emojiReactionsEnabled){
+				((FrameLayout) react.getParent()).setVisibility(View.GONE);
+				((FrameLayout) bookmark.getParent()).setVisibility(View.VISIBLE);
+				share.setVisibility(View.VISIBLE);
+				return;
+			}
+
+			AccountLocalPreferences.NewEmojiReactionButton newEmojiReactionButton = session.getLocalPreferences().newEmojiReactionButton;
+			if(newEmojiReactionButton == AccountLocalPreferences.NewEmojiReactionButton.WITH_REACTIONS){
+				((FrameLayout) react.getParent()).setVisibility(View.GONE);
+			}else{
+				((FrameLayout) react.getParent()).setVisibility(View.VISIBLE);
+			}
+			if(newEmojiReactionButton == AccountLocalPreferences.NewEmojiReactionButton.REPLACE_BOOKMARK){
+				((FrameLayout) bookmark.getParent()).setVisibility(View.GONE);
+			}else{
+				((FrameLayout) bookmark.getParent()).setVisibility(View.VISIBLE);
+			}
+			if(newEmojiReactionButton == AccountLocalPreferences.NewEmojiReactionButton.REPLACE_SHARE){
+				((FrameLayout) react.getParent()).setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 0));
+				share.setVisibility(View.GONE);
+			}else{
+				((FrameLayout) react.getParent()).setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
+				share.setVisibility(View.VISIBLE);
+			}
+
+			emojiKeyboard=new CustomEmojiPopupKeyboard(
+					(Activity) item.parentFragment.getContext(),
+					item.accountID,
+					AccountSessionManager.getInstance().getCustomEmojis(session.domain),
+					session.domain, true);
+			emojiKeyboard.setListener(this);
+			emojiKeyboardContainer.removeAllViews();
+			emojiKeyboardContainer.addView(emojiKeyboard.getView());
 		}
 
 		private void bindText(TextView btn, long count){
@@ -351,6 +400,22 @@ public class FooterStatusDisplayItem extends StatusDisplayItem{
 			return true;
 		}
 
+		private void onReactClick(View v){
+			emojiKeyboard.toggleKeyboardPopup(null);
+			if(!emojiKeyboard.isVisible()){
+				endEmojiReaction();
+				return;
+			}
+			DisplayMetrics displayMetrics = new DisplayMetrics();
+			int[] locationOnScreen = new int[2];
+			((Activity) v.getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+			v.getLocationOnScreen(locationOnScreen);
+			double fromScreenTop = (double) locationOnScreen[1] / displayMetrics.heightPixels;
+			if (fromScreenTop > 0.75) {
+				item.parentFragment.scrollBy(0, (int) (displayMetrics.heightPixels * 0.3));
+			}
+		}
+
 		private void onShareClick(View v){
 			if(item.status.preview) return;
 			UiUtils.opacityIn(v);
@@ -366,6 +431,28 @@ public class FooterStatusDisplayItem extends StatusDisplayItem{
 			return true;
 		}
 
+		@Override
+		public void onEmojiSelected(Emoji emoji) {
+			item.parentFragment.addEmojiReaction(getItemID(), item.status, emoji.shortcode, emoji);
+			endEmojiReaction();
+		}
+
+		@Override
+		public void onEmojiSelected(String emoji){
+			item.parentFragment.addEmojiReaction(getItemID(), item.status, emoji, null);
+			endEmojiReaction();
+		}
+
+		private void endEmojiReaction(){
+			if(emojiKeyboard.isVisible()) emojiKeyboard.toggleKeyboardPopup(null);
+			touchingView = null;
+			react.animate().scaleX(1).scaleY(1).setInterpolator(CubicBezierInterpolator.DEFAULT).setDuration(150).start();
+			UiUtils.opacityIn(react);
+		}
+
+		@Override
+		public void onBackspace() {}
+
 		private int descriptionForId(int id){
 			if(id==R.id.reply_btn)
 				return R.string.button_reply;
@@ -375,6 +462,8 @@ public class FooterStatusDisplayItem extends StatusDisplayItem{
 				return R.string.button_favorite;
 			if(id==R.id.bookmark_btn)
 				return R.string.add_bookmark;
+			if(id==R.id.react_btn)
+				return R.string.sk_button_react;
 			if(id==R.id.share_btn)
 				return R.string.button_share;
 			return 0;

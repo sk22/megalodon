@@ -27,6 +27,7 @@ import org.joinmastodon.android.api.requests.accounts.GetAccountRelationships;
 import org.joinmastodon.android.api.requests.announcements.DismissAnnouncement;
 import org.joinmastodon.android.api.requests.statuses.CreateStatus;
 import org.joinmastodon.android.api.requests.statuses.GetStatusSourceText;
+import org.joinmastodon.android.api.session.AccountLocalPreferences;
 import org.joinmastodon.android.api.session.AccountSession;
 import org.joinmastodon.android.api.session.AccountSessionManager;
 import org.joinmastodon.android.fragments.BaseStatusListFragment;
@@ -506,16 +507,18 @@ public class HeaderStatusDisplayItem extends StatusDisplayItem{
 			MenuItem report=menu.findItem(R.id.report);
 			MenuItem follow=menu.findItem(R.id.follow);
 			MenuItem manageUserLists = menu.findItem(R.id.manage_user_lists);
-			/* disabled in megalodon: add/remove bookmark is already available through status footer
+
+			AccountLocalPreferences lp = AccountSessionManager.get(item.accountID).getLocalPreferences();
 			MenuItem bookmark=menu.findItem(R.id.bookmark);
-			bookmark.setVisible(false);
-			if(item.status!=null){
+			if(lp.newEmojiReactionButton==AccountLocalPreferences.NewEmojiReactionButton.REPLACE_BOOKMARK && item.status!=null){
 				bookmark.setVisible(true);
 				bookmark.setTitle(item.status.bookmarked ? R.string.remove_bookmark : R.string.add_bookmark);
 			}else{
 				bookmark.setVisible(false);
 			}
-			*/
+			MenuItem share=menu.findItem(R.id.share);
+			share.setVisible(lp.newEmojiReactionButton==AccountLocalPreferences.NewEmojiReactionButton.REPLACE_SHARE);
+
 			if(isPostScheduled || isOwnPost){
 				mute.setVisible(false);
 				block.setVisible(false);

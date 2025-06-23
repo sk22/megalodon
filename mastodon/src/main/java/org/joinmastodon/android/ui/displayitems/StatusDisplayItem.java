@@ -305,8 +305,7 @@ public abstract class StatusDisplayItem{
 		}
 		AccountLocalPreferences lp=fragment.getLocalPrefs();
 		if((flags & FLAG_NO_EMOJI_REACTIONS)==0 && !status.preview && lp.emojiReactionsEnabled &&
-				(lp.showEmojiReactions!=ONLY_OPENED || fragment instanceof ThreadFragment) &&
-				statusForContent.reactions!=null){
+				(lp.showEmojiReactions!=ONLY_OPENED || fragment instanceof ThreadFragment)){
 			boolean isMainStatus=fragment instanceof ThreadFragment t && t.getMainStatus().id.equals(statusForContent.id);
 			boolean showAddButton=lp.showEmojiReactions==ALWAYS || isMainStatus;
 			items.add(new EmojiReactionsStatusDisplayItem(parentID, fragment, statusForContent, accountID, !showAddButton, false));

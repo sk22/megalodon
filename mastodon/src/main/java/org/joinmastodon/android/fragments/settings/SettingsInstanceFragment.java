@@ -26,7 +26,7 @@ import me.grishka.appkit.Nav;
 
 public class SettingsInstanceFragment extends BaseSettingsFragment<Void> implements HasAccountID{
 	private CheckableListItem<Void> contentTypesItem, emojiReactionsItem, localOnlyItem, glitchModeItem;
-	private ListItem<Void> defaultContentTypeItem, showEmojiReactionsItem;
+	private ListItem<Void> defaultContentTypeItem, showEmojiReactionsItem, newEmojiReactionButton;
 	private AccountLocalPreferences lp;
 
 	@Override
@@ -43,7 +43,8 @@ public class SettingsInstanceFragment extends BaseSettingsFragment<Void> impleme
 				contentTypesItem=new CheckableListItem<>(R.string.sk_settings_content_types, R.string.sk_settings_content_types_explanation, CheckableListItem.Style.SWITCH, lp.contentTypesEnabled, R.drawable.ic_fluent_text_edit_style_24_regular, i->onContentTypeClick()),
 				defaultContentTypeItem=new ListItem<>(R.string.sk_settings_default_content_type, lp.defaultContentType.getName(), R.drawable.ic_fluent_text_bold_24_regular, this::onDefaultContentTypeClick, 0, true),
 				emojiReactionsItem=new CheckableListItem<>(R.string.sk_settings_emoji_reactions, R.string.sk_settings_emoji_reactions_explanation, CheckableListItem.Style.SWITCH, lp.emojiReactionsEnabled, R.drawable.ic_fluent_emoji_laugh_24_regular, i->onEmojiReactionsClick()),
-				showEmojiReactionsItem=new ListItem<>(R.string.sk_settings_show_emoji_reactions, getShowEmojiReactionsString(), R.drawable.ic_fluent_emoji_24_regular, this::onShowEmojiReactionsClick, 0, true),
+				showEmojiReactionsItem=new ListItem<>(R.string.sk_settings_show_emoji_reactions, getShowEmojiReactionsString(), R.drawable.ic_fluent_emoji_24_regular, this::onShowEmojiReactionsClick, 0, false),
+				newEmojiReactionButton=new ListItem<>(R.string.sk_settings_new_emoji_reaction_button, getNewEmojiReactionButton(), R.drawable.ic_fluent_emoji_add_24_regular, this::onNewEmojiReactionButtonClick, 0, true),
 				localOnlyItem=new CheckableListItem<>(R.string.sk_settings_support_local_only, R.string.sk_settings_local_only_explanation, CheckableListItem.Style.SWITCH, lp.localOnlySupported, R.drawable.ic_fluent_eye_24_regular, i->onLocalOnlyClick()),
 				glitchModeItem=new CheckableListItem<>(R.string.sk_settings_glitch_instance, R.string.sk_settings_glitch_mode_explanation, CheckableListItem.Style.SWITCH, lp.glitchInstance, R.drawable.ic_fluent_eye_24_filled, i->toggleCheckableItem(glitchModeItem))
 		));
@@ -51,6 +52,7 @@ public class SettingsInstanceFragment extends BaseSettingsFragment<Void> impleme
 		defaultContentTypeItem.isEnabled=contentTypesItem.checked;
 		emojiReactionsItem.checkedChangeListener=checked->onEmojiReactionsClick();
 		showEmojiReactionsItem.isEnabled=emojiReactionsItem.checked;
+		newEmojiReactionButton.isEnabled=emojiReactionsItem.checked;
 		localOnlyItem.checkedChangeListener=checked->onLocalOnlyClick();
 		glitchModeItem.isEnabled=localOnlyItem.checked;
 	}
@@ -129,6 +131,22 @@ public class SettingsInstanceFragment extends BaseSettingsFragment<Void> impleme
 				.show();
 	}
 
+	private void onNewEmojiReactionButtonClick(ListItem<?> item_){
+		int selected=lp.newEmojiReactionButton.ordinal();
+		int[] newSelected={selected};
+		new M3AlertDialogBuilder(getActivity())
+				.setTitle(R.string.sk_settings_new_emoji_reaction_button)
+				.setSingleChoiceItems((String[]) IntStream.of(R.string.sk_settings_new_emoji_reaction_button_with_reactions, R.string.sk_settings_new_emoji_reaction_button_replace_bookmark, R.string.sk_settings_new_emoji_reaction_button_replace_share).mapToObj(this::getString).toArray(String[]::new),
+						selected, (dlg, item)->newSelected[0]=item)
+				.setPositiveButton(R.string.ok, (dlg, item)->{
+					lp.newEmojiReactionButton=AccountLocalPreferences.NewEmojiReactionButton.values()[newSelected[0]];
+					newEmojiReactionButton.subtitleRes=getNewEmojiReactionButton();
+					rebindItem(newEmojiReactionButton);
+				})
+				.setNegativeButton(R.string.cancel, null)
+				.show();
+	}
+
 	private @StringRes int getShowEmojiReactionsString(){
 		return switch(lp.showEmojiReactions){
 			case HIDE_EMPTY -> R.string.sk_settings_show_emoji_reactions_hide_empty;
@@ -137,10 +155,20 @@ public class SettingsInstanceFragment extends BaseSettingsFragment<Void> impleme
 		};
 	}
 
+	private @StringRes int getNewEmojiReactionButton(){
+		return switch(lp.newEmojiReactionButton){
+			case WITH_REACTIONS -> R.string.sk_settings_new_emoji_reaction_button_with_reactions;
+			case REPLACE_BOOKMARK -> R.string.sk_settings_new_emoji_reaction_button_replace_bookmark;
+			case REPLACE_SHARE -> R.string.sk_settings_new_emoji_reaction_button_replace_share;
+		};
+	}
+
 	private void onEmojiReactionsClick(){
 		toggleCheckableItem(emojiReactionsItem);
 		showEmojiReactionsItem.isEnabled=emojiReactionsItem.checked;
+		newEmojiReactionButton.isEnabled=emojiReactionsItem.checked;
 		rebindItem(showEmojiReactionsItem);
+		rebindItem(newEmojiReactionButton);
 	}
 
 	private void onLocalOnlyClick(){

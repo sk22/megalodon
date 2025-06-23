@@ -43,6 +43,7 @@ public class AccountLocalPreferences{
 	public boolean keepOnlyLatestNotification;
 	public boolean emojiReactionsEnabled;
 	public ShowEmojiReactions showEmojiReactions;
+	public NewEmojiReactionButton newEmojiReactionButton;
 	public ColorPreference color;
 	public ArrayList<Emoji> recentCustomEmoji;
 
@@ -73,6 +74,7 @@ public class AccountLocalPreferences{
 		keepOnlyLatestNotification=prefs.getBoolean("keepOnlyLatestNotification", false);
 		emojiReactionsEnabled=prefs.getBoolean("emojiReactionsEnabled", session.getInstance().isPresent() && session.getInstance().get().isAkkoma());
 		showEmojiReactions=ShowEmojiReactions.valueOf(prefs.getString("showEmojiReactions", ShowEmojiReactions.HIDE_EMPTY.name()));
+		newEmojiReactionButton=NewEmojiReactionButton.valueOf(prefs.getString("newEmojiReactionButton", NewEmojiReactionButton.WITH_REACTIONS.name()));
 		color=prefs.contains("color") ? ColorPreference.valueOf(prefs.getString("color", null)) : null;
 		recentCustomEmoji=fromJson(prefs.getString("recentCustomEmoji", null), recentCustomEmojiType, new ArrayList<>());
 	}
@@ -112,6 +114,7 @@ public class AccountLocalPreferences{
 				.putBoolean("keepOnlyLatestNotification", keepOnlyLatestNotification)
 				.putBoolean("emojiReactionsEnabled", emojiReactionsEnabled)
 				.putString("showEmojiReactions", showEmojiReactions.name())
+				.putString("newEmojiReactionButton", newEmojiReactionButton.name())
 				.putString("color", color!=null ? color.name() : null)
 				.putString("recentCustomEmoji", gson.toJson(recentCustomEmoji))
 				.apply();
@@ -145,5 +148,11 @@ public class AccountLocalPreferences{
 		HIDE_EMPTY,
 		ONLY_OPENED,
 		ALWAYS
+	}
+
+	public enum NewEmojiReactionButton{
+		WITH_REACTIONS,
+		REPLACE_BOOKMARK,
+		REPLACE_SHARE
 	}
 }

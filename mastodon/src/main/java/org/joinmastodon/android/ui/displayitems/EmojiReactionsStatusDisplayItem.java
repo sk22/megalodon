@@ -30,6 +30,7 @@ import org.joinmastodon.android.api.requests.statuses.AddStatusReaction;
 import org.joinmastodon.android.api.requests.statuses.DeleteStatusReaction;
 import org.joinmastodon.android.api.requests.statuses.PleromaAddStatusReaction;
 import org.joinmastodon.android.api.requests.statuses.PleromaDeleteStatusReaction;
+import org.joinmastodon.android.api.session.AccountLocalPreferences;
 import org.joinmastodon.android.api.session.AccountSession;
 import org.joinmastodon.android.api.session.AccountSessionManager;
 import org.joinmastodon.android.events.EmojiReactionsUpdatedEvent;
@@ -174,6 +175,9 @@ public class EmojiReactionsStatusDisplayItem extends StatusDisplayItem {
 			item.status.reactions.forEach(r->r.request=r.getUrl(item.playGifs)!=null
 					? new UrlImageLoaderRequest(r.getUrl(item.playGifs), V.sp(24), V.sp(24))
 					: null);
+			addButton.setVisibility(session.getLocalPreferences().newEmojiReactionButton != AccountLocalPreferences.NewEmojiReactionButton.WITH_REACTIONS
+					? View.GONE
+					: View.VISIBLE);
 			emojiKeyboard=new CustomEmojiPopupKeyboard(
 					(Activity) item.parentFragment.getContext(),
 					item.accountID,
@@ -213,7 +217,7 @@ public class EmojiReactionsStatusDisplayItem extends StatusDisplayItem {
 			hideEmojiKeyboard();
 		}
 
-		private void addEmojiReaction(String emoji, Emoji info) {
+		public void addEmojiReaction(String emoji, Emoji info) {
 			int countBefore=item.status.reactions.size();
 			for(int i=0; i<item.status.reactions.size(); i++){
 				EmojiReaction r=item.status.reactions.get(i);

@@ -22,13 +22,19 @@ import org.joinmastodon.android.R;
 import org.joinmastodon.android.api.MastodonAPIRequest;
 import org.joinmastodon.android.api.requests.accounts.GetAccountRelationships;
 import org.joinmastodon.android.api.requests.polls.SubmitPollVote;
+import org.joinmastodon.android.api.requests.statuses.AddStatusReaction;
 import org.joinmastodon.android.api.requests.statuses.AkkomaTranslateStatus;
+import org.joinmastodon.android.api.requests.statuses.DeleteStatusReaction;
+import org.joinmastodon.android.api.requests.statuses.PleromaAddStatusReaction;
+import org.joinmastodon.android.api.requests.statuses.PleromaDeleteStatusReaction;
 import org.joinmastodon.android.api.requests.statuses.TranslateStatus;
 import org.joinmastodon.android.api.session.AccountSessionManager;
+import org.joinmastodon.android.events.EmojiReactionsUpdatedEvent;
 import org.joinmastodon.android.events.PollUpdatedEvent;
 import org.joinmastodon.android.model.Account;
 import org.joinmastodon.android.model.AkkomaTranslation;
 import org.joinmastodon.android.model.DisplayItemsParent;
+import org.joinmastodon.android.model.Emoji;
 import org.joinmastodon.android.model.Poll;
 import org.joinmastodon.android.model.Relationship;
 import org.joinmastodon.android.model.Status;
@@ -36,6 +42,7 @@ import org.joinmastodon.android.model.Translation;
 import org.joinmastodon.android.ui.BetterItemAnimator;
 import org.joinmastodon.android.ui.M3AlertDialogBuilder;
 import org.joinmastodon.android.ui.displayitems.AccountStatusDisplayItem;
+import org.joinmastodon.android.ui.displayitems.EmojiReactionsStatusDisplayItem;
 import org.joinmastodon.android.ui.displayitems.ExtendedFooterStatusDisplayItem;
 import org.joinmastodon.android.ui.displayitems.FooterStatusDisplayItem;
 import org.joinmastodon.android.ui.displayitems.GapStatusDisplayItem;
@@ -941,6 +948,28 @@ public abstract class BaseStatusListFragment<T extends DisplayItemsParent> exten
 				item.rebind();
 			}
 		}
+	}
+
+	public void addEmojiReaction(String itemID, Status status, String emoji, Emoji info) {
+		EmojiReactionsStatusDisplayItem.Holder holder=findHolderOfType(itemID, EmojiReactionsStatusDisplayItem.Holder.class);
+		if(holder!=null){
+			holder.addEmojiReaction(emoji, info);
+			return;
+		}
+
+		MastodonAPIRequest<Status> req=isInstanceAkkoma() ? new PleromaAddStatusReaction(status.id, emoji) : new AddStatusReaction(status.id, emoji);
+		req.setCallback(new Callback<>(){
+			@Override
+			public void onSuccess(Status result){
+				E.post(new EmojiReactionsUpdatedEvent(result.id, result.reactions, false, null));
+			}
+
+			@Override
+			public void onError(ErrorResponse error){
+				error.showToast(getContext());
+			}
+		});
+		req.exec(accountID);
 	}
 
 	public void rebuildAllDisplayItems(){

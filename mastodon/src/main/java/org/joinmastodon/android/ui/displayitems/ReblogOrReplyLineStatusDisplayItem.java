@@ -7,6 +7,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +19,10 @@ import org.joinmastodon.android.fragments.BaseStatusListFragment;
 import org.joinmastodon.android.model.Emoji;
 import org.joinmastodon.android.model.Status;
 import org.joinmastodon.android.model.StatusPrivacy;
+import org.joinmastodon.android.ui.text.AvatarSpan;
+import org.joinmastodon.android.ui.text.CustomEmojiSpan;
 import org.joinmastodon.android.ui.text.HtmlParser;
+import org.joinmastodon.android.ui.text.SpacerSpan;
 import org.joinmastodon.android.ui.utils.CustomEmojiHelper;
 import org.joinmastodon.android.ui.utils.UiUtils;
 
@@ -53,6 +57,13 @@ public class ReblogOrReplyLineStatusDisplayItem extends StatusDisplayItem{
 		SpannableStringBuilder ssb=new SpannableStringBuilder(text);
 		if(AccountSessionManager.get(parentFragment.getAccountID()).getLocalPreferences().customEmojiInNames)
 			HtmlParser.parseCustomEmoji(ssb, emojis);
+
+		if(status.reblog!=null&&handleClick!=null){
+			//add temp chars for span replacement, should be same as spans added below
+			ssb.insert(0, "  ");
+			ssb.setSpan(new AvatarSpan(status.account), 0, 1, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+			ssb.setSpan(new SpacerSpan(15, 20), 1, 2, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+		}
 		this.text=ssb;
 		emojiHelper.setText(ssb);
 		this.fullText=fullText;

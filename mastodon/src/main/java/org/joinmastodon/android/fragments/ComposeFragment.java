@@ -1124,6 +1124,7 @@ public class ComposeFragment extends MastodonToolbarFragment implements OnBackPr
 			public void onSuccess(Status result){
 				if(preview){
 					openPreview(result);
+					uuid=null;
 					return;
 				}
 
@@ -1562,7 +1563,6 @@ public class ComposeFragment extends MastodonToolbarFragment implements OnBackPr
 		}
 
 		contentTypePopup.setOnMenuItemClickListener(i->{
-			uuid=null;
 			int index=i.getItemId();
 			contentType=ContentType.values()[index];
 			btn.setSelected(index!=ContentType.UNSPECIFIED.ordinal() && index!=ContentType.PLAIN.ordinal());

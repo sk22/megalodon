@@ -25,6 +25,7 @@
 	<application
 		android:name=".MastodonApp"
 		android:allowBackup="true"
+		android:dataExtractionRules="@xml/backup_rules"
 		android:label="@string/sk_app_name"
 		android:supportsRtl="true"
 		android:localeConfig="@xml/locales_config"

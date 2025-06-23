@@ -85,6 +85,7 @@ public class AccountSessionManager{
 
 	private AccountSessionManager(){
 		prefs=MastodonApp.context.getSharedPreferences("account_manager", Context.MODE_PRIVATE);
+		// This file should not be backed up, otherwise the app may start with accounts already logged in. See res/xml/backup_rules.xml
 		File file=new File(MastodonApp.context.getFilesDir(), "accounts.json");
 		if(!file.exists())
 			return;

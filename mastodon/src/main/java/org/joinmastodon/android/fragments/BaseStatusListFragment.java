@@ -619,6 +619,8 @@ public abstract class BaseStatusListFragment<T extends DisplayItemsParent> exten
 			displayItems.addAll(index+1, spoilerItem.contentItems);
 			adapter.notifyItemRangeInserted(index+1, spoilerItem.contentItems.size());
 		}else{
+			if(spoilers.size()>1 && !isForQuote && status.quote.spoilerRevealed)
+				toggleSpoiler(status.quote, true, itemID);
 			displayItems.subList(index+1, index+1+spoilerItem.contentItems.size()).clear();
 			adapter.notifyItemRangeRemoved(index+1, spoilerItem.contentItems.size());
 		}
@@ -631,19 +633,23 @@ public abstract class BaseStatusListFragment<T extends DisplayItemsParent> exten
 		list.invalidateItemDecorations();
 	}
 
-	public void onEnableExpandable(TextStatusDisplayItem.Holder holder, boolean expandable) {
+	public void onEnableExpandable(TextStatusDisplayItem.Holder holder, boolean expandable, boolean isForQuote) {
 		Status s=holder.getItem().status;
 		if(s.textExpandable!=expandable && list!=null) {
 			s.textExpandable=expandable;
-			HeaderStatusDisplayItem.Holder header=findHolderOfType(holder.getItemID(), HeaderStatusDisplayItem.Holder.class);
+			List<HeaderStatusDisplayItem.Holder> headers=findAllHoldersOfType(holder.getItemID(), HeaderStatusDisplayItem.Holder.class);
+			HeaderStatusDisplayItem.Holder header=headers.size() > 1 && isForQuote ? headers.get(1) : headers.get(0);
 			if(header!=null) header.bindCollapseButton();
 		}
 	}
 
-	public void onToggleExpanded(Status status, String itemID) {
+	public void onToggleExpanded(Status status, boolean isForQuote, String itemID) {
 		status.textExpanded = !status.textExpanded;
-		notifyItemChanged(itemID, TextStatusDisplayItem.class);
-		HeaderStatusDisplayItem.Holder header=findHolderOfType(itemID, HeaderStatusDisplayItem.Holder.class);
+		List<TextStatusDisplayItem.Holder> textItems = findAllHoldersOfType(itemID, TextStatusDisplayItem.Holder.class);
+		TextStatusDisplayItem.Holder text = textItems.size() > 1 && isForQuote ? textItems.get(1) : textItems.get(0);
+		adapter.notifyItemChanged(text.getAbsoluteAdapterPosition());
+		List<HeaderStatusDisplayItem.Holder> headers=findAllHoldersOfType(itemID, HeaderStatusDisplayItem.Holder.class);
+		HeaderStatusDisplayItem.Holder header=headers.size() > 1 && isForQuote ? headers.get(1) : headers.get(0);
 		if(header!=null) header.animateExpandToggle();
 		else notifyItemChanged(itemID, HeaderStatusDisplayItem.class);
 	}

@@ -173,7 +173,7 @@ public class HeaderStatusDisplayItem extends StatusDisplayItem{
 					fragment.removeNotification(item.notification);
 				}
 			}));
-			collapseBtn.setOnClickListener(l -> item.parentFragment.onToggleExpanded(item.status, getItemID()));
+			collapseBtn.setOnClickListener(l -> item.parentFragment.onToggleExpanded(item.status, item.isForQuote, getItemID()));
 
 			optionsMenu=new PopupMenu(activity, more);
 			optionsMenu.inflate(R.menu.post);

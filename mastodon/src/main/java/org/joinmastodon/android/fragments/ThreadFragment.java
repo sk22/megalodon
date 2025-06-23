@@ -181,6 +181,7 @@ public class ThreadFragment extends StatusListFragment implements ProvidesAssist
 				s.spoilerRevealed = oldStatus.spoilerRevealed;
 				s.sensitiveRevealed = oldStatus.sensitiveRevealed;
 				s.filterRevealed = oldStatus.filterRevealed;
+				s.textExpanded = oldStatus.textExpanded;
 			}
 			if (GlobalUserPreferences.autoRevealEqualSpoilers != AutoRevealMode.NEVER &&
 					s.spoilerText != null &&
@@ -257,6 +258,13 @@ public class ThreadFragment extends StatusListFragment implements ProvidesAssist
 		updatedStatus.filterRevealed = mainStatus.filterRevealed;
 		updatedStatus.spoilerRevealed = mainStatus.spoilerRevealed;
 		updatedStatus.sensitiveRevealed = mainStatus.sensitiveRevealed;
+		updatedStatus.textExpanded = mainStatus.textExpanded;
+		if(updatedStatus.quote!=null && mainStatus.quote!=null){
+			updatedStatus.quote.filterRevealed = mainStatus.quote.filterRevealed;
+			updatedStatus.quote.spoilerRevealed = mainStatus.quote.spoilerRevealed;
+			updatedStatus.quote.sensitiveRevealed = mainStatus.quote.sensitiveRevealed;
+			updatedStatus.quote.textExpanded = mainStatus.quote.textExpanded;
+		}
 
 		// returning fired event object to facilitate testing
 		Object event;

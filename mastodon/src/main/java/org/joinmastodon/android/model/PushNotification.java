@@ -45,6 +45,7 @@ public class PushNotification extends BaseModel{
 			case REBLOG -> R.string.notification_boosted;
 			case FAVORITE -> R.string.user_favorited;
 			case POLL -> R.string.poll_ended;
+			case STATUS -> R.string.sk_posted;
 			case UPDATE -> R.string.sk_post_edited;
 			case SIGN_UP -> R.string.sk_signed_up;
 			case REPORT -> R.string.sk_reported;

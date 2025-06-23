@@ -15,6 +15,35 @@
 		android:text="@string/confirm_mute"
 		android:textSize="16sp"/>
 
+	<LinearLayout
+		android:id="@+id/mute_notifications"
+		android:orientation="horizontal"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:minHeight="48dp"
+		android:gravity="center_vertical"
+		android:layoutDirection="locale">
+
+		<TextView
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:paddingVertical="8dp"
+			android:textSize="16sp"
+			android:textColor="?android:textColorPrimary"
+			android:text="@string/sk_mute_notifications_label" />
+
+		<org.joinmastodon.android.ui.views.M3Switch
+			android:id="@+id/mute_notifications_switch"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="16dp"
+			android:checked="true"
+			android:focusable="false"
+			android:clickable="false"/>
+
+	</LinearLayout>
+
 	<org.joinmastodon.android.ui.views.AutoOrientationLinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
@@ -28,7 +57,7 @@
 			android:paddingVertical="8dp"
 			android:gravity="center_vertical"
 			android:textColor="?android:textColorPrimary"
-			android:text="@string/sk_mute_label"
+			android:text="@string/sk_mute_duration_label"
 			android:textSize="16sp"/>
 
 		<Button

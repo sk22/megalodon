@@ -61,6 +61,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -567,6 +568,8 @@ public class UiUtils {
 		durationView.setLayoutParams(params);
 		Button button=durationView.findViewById(R.id.button);
 		((TextView) durationView.findViewById(R.id.message)).setText(context.getString(R.string.confirm_mute, account.getDisplayName()));
+		Switch muteNotificationsSwitch=durationView.findViewById(R.id.mute_notifications_switch);
+		durationView.findViewById(R.id.mute_notifications).setOnClickListener(l->muteNotificationsSwitch.setChecked(!muteNotificationsSwitch.isChecked()));
 
 		AtomicReference<Duration> muteDuration=new AtomicReference<>(Duration.ZERO);
 
@@ -603,7 +606,7 @@ public class UiUtils {
 				.setMessage(currentlyMuted ? context.getString(R.string.confirm_unmute, account.getDisplayName()) : null)
 				.setView(currentlyMuted ? null : durationView)
 				.setPositiveButton(context.getString(currentlyMuted ? R.string.do_unmute : R.string.do_mute), (dlg, i)->{
-					new SetAccountMuted(account.id, !currentlyMuted, muteDuration.get().getSeconds())
+					new SetAccountMuted(account.id, !currentlyMuted, muteDuration.get().getSeconds(), muteNotificationsSwitch.isChecked())
 							.setCallback(new Callback<>(){
 								@Override
 								public void onSuccess(Relationship result){

@@ -4,15 +4,18 @@ import org.joinmastodon.android.api.MastodonAPIRequest;
 import org.joinmastodon.android.model.Relationship;
 
 public class SetAccountMuted extends MastodonAPIRequest<Relationship>{
-	public SetAccountMuted(String id, boolean muted, long duration){
+	public SetAccountMuted(String id, boolean muted, long duration, boolean muteNotifications){
 		super(HttpMethod.POST, "/accounts/"+id+"/"+(muted ? "mute" : "unmute"), Relationship.class);
-		setRequestBody(new Request(duration));
+		if(muted)
+			setRequestBody(new Request(duration, muteNotifications));
 	}
 
 	private static class Request{
 		public long duration;
-		public Request(long duration){
+		public boolean muteNotifications;
+		public Request(long duration, boolean muteNotifications){
 			this.duration=duration;
+			this.muteNotifications=muteNotifications;
 		}
 	}
 }

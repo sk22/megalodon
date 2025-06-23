@@ -372,7 +372,8 @@
     <string name="sk_button_react">React with emoji</string>
     <string name="sk_enter_emoji_toast">Please type an emoji</string>
     <string name="sk_enter_emoji_hint">Type an emoji or search</string>
-    <string name="sk_mute_label">Duration</string>
+    <string name="sk_mute_duration_label">Duration</string>
+	<string name="sk_mute_notifications_label">Mute Notifications?</string>
     <string name="sk_duration_indefinite">Indefinite</string>
     <string name="sk_duration_minutes_5">5 minutes</string>
     <string name="sk_duration_minutes_30">30 minutes</string>

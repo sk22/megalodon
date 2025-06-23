@@ -170,7 +170,7 @@ public class TextStatusDisplayItem extends StatusDisplayItem{
 		@Override
 		public void setImage(int index, Drawable image){
 			getEmojiHelper().setImageDrawable(index, image);
-			text.invalidate();
+			text.setText(text.getText());
 			if(image instanceof Animatable){
 				((Animatable) image).start();
 				if(image instanceof MovieDrawable)
@@ -181,7 +181,7 @@ public class TextStatusDisplayItem extends StatusDisplayItem{
 		@Override
 		public void clearImage(int index){
 			getEmojiHelper().setImageDrawable(index, null);
-			text.invalidate();
+			text.setText(text.getText());
 		}
 
 		private CustomEmojiHelper getEmojiHelper(){

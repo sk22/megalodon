@@ -1618,8 +1618,9 @@ public class ProfileFragment extends LoaderFragment implements OnBackPressedList
 		public void setImage(int index, Drawable image){
 			CustomEmojiSpan span=index>=item.nameEmojis.length ? item.valueEmojis[index-item.nameEmojis.length] : item.nameEmojis[index];
 			span.setDrawable(image);
-			title.invalidate();
-			value.invalidate();
+			title.setText(title.getText());
+			value.setText(value.getText());
+			toolbarTitleView.setText(toolbarTitleView.getText());
 		}
 
 		@Override

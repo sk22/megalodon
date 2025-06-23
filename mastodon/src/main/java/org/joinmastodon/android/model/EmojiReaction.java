@@ -38,7 +38,7 @@ public class EmojiReaction {
 		reaction.staticUrl=info.staticUrl;
 		reaction.accounts=new ArrayList<>(Collections.singleton(me));
 		reaction.accountIds=new ArrayList<>(Collections.singleton(me.id));
-		reaction.request=new UrlImageLoaderRequest(info.url, V.sp(24), V.sp(24));
+		reaction.request=new UrlImageLoaderRequest(info.url, 0, V.sp(24));
 		return reaction;
 	}
 

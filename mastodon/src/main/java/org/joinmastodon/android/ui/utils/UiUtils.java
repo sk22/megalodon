@@ -401,7 +401,6 @@ public class UiUtils {
 		CustomEmojiSpan[] spans = text.getSpans(0, text.length(), CustomEmojiSpan.class);
 		if (spans.length == 0)
 			return;
-		int emojiSize = V.dp(20);
 		Map<Emoji, List<CustomEmojiSpan>> spansByEmoji = Arrays.stream(spans).collect(Collectors.groupingBy(s -> s.emoji));
 		for (Map.Entry<Emoji, List<CustomEmojiSpan>> emoji : spansByEmoji.entrySet()) {
 			ViewImageLoader.load(new ViewImageLoader.Target() {
@@ -412,14 +411,14 @@ public class UiUtils {
 					for (CustomEmojiSpan span : emoji.getValue()) {
 						span.setDrawable(d);
 					}
-					view.invalidate();
+					view.setText(view.getText());
 				}
 
 				@Override
 				public View getView() {
 					return view;
 				}
-			}, null, new UrlImageLoaderRequest(emoji.getKey().url, emojiSize, emojiSize), null, false, true);
+			}, null, new UrlImageLoaderRequest(emoji.getKey().url, 0, V.dp(20)), null, false, true);
 		}
 	}
 

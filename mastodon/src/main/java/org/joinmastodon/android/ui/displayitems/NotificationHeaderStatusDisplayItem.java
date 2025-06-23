@@ -145,7 +145,7 @@ public class NotificationHeaderStatusDisplayItem extends StatusDisplayItem{
 				avatar.setImageDrawable(image);
 			}else{
 				item.emojiHelper.setImageDrawable(index-1, image);
-				text.invalidate();
+				text.setText(text.getText());
 			}
 			if(image instanceof Animatable)
 				((Animatable) image).start();

@@ -297,8 +297,8 @@ public class FollowRequestsListFragment extends MastodonRecyclerFragment<FollowR
 				cover.setImageDrawable(image);
 			}else{
 				item.emojiHelper.setImageDrawable(index-2, image);
-				name.invalidate();
-				bio.invalidate();
+				name.setText(name.getText());
+				bio.setText(bio.getText());
 			}
 			if(image instanceof Animatable a && !a.isRunning())
 				a.start();

@@ -172,7 +172,7 @@ public class EmojiReactionsStatusDisplayItem extends StatusDisplayItem {
 			addButton.setSelected(false);
 			AccountSession session=item.parentFragment.getSession();
 			item.status.reactions.forEach(r->r.request=r.getUrl(item.playGifs)!=null
-					? new UrlImageLoaderRequest(r.getUrl(item.playGifs), V.sp(24), V.sp(24))
+					? new UrlImageLoaderRequest(r.getUrl(item.playGifs), 0, V.sp(24))
 					: null);
 			emojiKeyboard=new CustomEmojiPopupKeyboard(
 					(Activity) item.parentFragment.getContext(),
@@ -342,7 +342,9 @@ public class EmojiReactionsStatusDisplayItem extends StatusDisplayItem {
 
 			@Override
 			public void setImage(int index, Drawable drawable){
-				drawable.setBounds(0, 0, V.sp(24), V.sp(24));
+				int height=V.sp(24);
+				int width=drawable.getIntrinsicWidth()*height/drawable.getIntrinsicHeight();
+				drawable.setBounds(0, 0, width, height);
 				btn.setCompoundDrawablesRelative(drawable, null, null, null);
 				if(drawable instanceof Animatable) ((Animatable) drawable).start();
 			}

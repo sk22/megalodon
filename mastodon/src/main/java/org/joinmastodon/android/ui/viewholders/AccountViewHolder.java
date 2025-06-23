@@ -170,8 +170,8 @@ public class AccountViewHolder extends BindableViewHolder<AccountViewModel> impl
 			avatar.setImageDrawable(image);
 		}else{
 			item.emojiHelper.setImageDrawable(index-1, image);
-			name.invalidate();
-			bio.invalidate();
+			name.setText(name.getText());
+			bio.setText(bio.getText());
 		}
 
 		if(image instanceof Animatable a && !a.isRunning())

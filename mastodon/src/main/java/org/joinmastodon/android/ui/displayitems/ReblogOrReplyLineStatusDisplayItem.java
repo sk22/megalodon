@@ -139,8 +139,8 @@ public class ReblogOrReplyLineStatusDisplayItem extends StatusDisplayItem{
 			int firstHelperCount=item.emojiHelper.getImageCount();
 			CustomEmojiHelper helper=index<firstHelperCount ? item.emojiHelper : item.extra.emojiHelper;
 			helper.setImageDrawable(firstHelperCount>0 ? index%firstHelperCount : index, image);
-			text.invalidate();
-			extraText.invalidate();
+			text.setText(text.getText());
+			extraText.setText(extraText.getText());
 		}
 
 		@Override

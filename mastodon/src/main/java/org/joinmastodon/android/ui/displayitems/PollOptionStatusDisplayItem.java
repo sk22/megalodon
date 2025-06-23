@@ -125,7 +125,7 @@ public class PollOptionStatusDisplayItem extends StatusDisplayItem{
 		@Override
 		public void setImage(int index, Drawable image){
 			item.emojiHelper.setImageDrawable(index, image);
-			text.invalidate();
+			text.setText(text.getText());
 			if(image instanceof Animatable){
 				((Animatable) image).start();
 			}
@@ -134,7 +134,7 @@ public class PollOptionStatusDisplayItem extends StatusDisplayItem{
 		@Override
 		public void clearImage(int index){
 			item.emojiHelper.setImageDrawable(index, null);
-			text.invalidate();
+			text.setText(text.getText());
 		}
 
 		private void onButtonClick(View v){

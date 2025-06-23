@@ -114,7 +114,7 @@ public class SpoilerStatusDisplayItem extends StatusDisplayItem{
 		@Override
 		public void setImage(int index, Drawable image){
 			item.emojiHelper.setImageDrawable(index, image);
-			title.invalidate();
+			title.setText(title.getText());
 		}
 
 		@Override

@@ -24,7 +24,8 @@ public class CustomEmojiSpan extends ReplacementSpan{
 
 	@Override
 	public int getSize(@NonNull Paint paint, CharSequence text, int start, int end, @Nullable Paint.FontMetricsInt fm){
-		return Math.round(paint.descent()-paint.ascent());
+		int size = Math.round(paint.descent()-paint.ascent());
+		return drawable!=null ? (int) (drawable.getIntrinsicWidth()*(size/(float) drawable.getIntrinsicHeight())) : size;
 	}
 
 	@Override
@@ -45,7 +46,8 @@ public class CustomEmojiSpan extends ReplacementSpan{
 			}
 			canvas.save();
 			canvas.translate(x, top);
-			canvas.scale(size/(float)dw, size/(float)dh, 0f, 0f);
+			float scale = size/(float)dh;
+			canvas.scale(scale, scale, 0f, 0f);
 			drawable.draw(canvas);
 			canvas.restore();
 		}
@@ -56,7 +58,6 @@ public class CustomEmojiSpan extends ReplacementSpan{
 	}
 
 	public UrlImageLoaderRequest createImageLoaderRequest(){
-		int size=V.dp(20);
-		return new UrlImageLoaderRequest(GlobalUserPreferences.playGifs ? emoji.url : emoji.staticUrl, size, size);
+		return new UrlImageLoaderRequest(GlobalUserPreferences.playGifs ? emoji.url : emoji.staticUrl, 0, V.dp(20));
 	}
 }

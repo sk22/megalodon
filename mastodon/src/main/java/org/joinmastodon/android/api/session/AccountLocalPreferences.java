@@ -14,10 +14,12 @@ import org.joinmastodon.android.GlobalUserPreferences;
 import org.joinmastodon.android.R;
 import org.joinmastodon.android.model.ContentType;
 import org.joinmastodon.android.model.Emoji;
+import org.joinmastodon.android.model.Instance;
 import org.joinmastodon.android.model.TimelineDefinition;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class AccountLocalPreferences{
 	private final SharedPreferences prefs;
@@ -59,19 +61,20 @@ public class AccountLocalPreferences{
 		serverSideFiltersSupported=prefs.getBoolean("serverSideFilters", false);
 
 		// MEGALODON
+		Optional<Instance> instance=session.getInstance();
 		showReplies=prefs.getBoolean("showReplies", true);
 		showBoosts=prefs.getBoolean("showBoosts", true);
 		recentLanguages=fromJson(prefs.getString("recentLanguages", null), recentLanguagesType, new ArrayList<>());
 		bottomEncoding=prefs.getBoolean("bottomEncoding", false);
-		defaultContentType=enumValue(ContentType.class, prefs.getString("defaultContentType", ContentType.PLAIN.name()));
-		contentTypesEnabled=prefs.getBoolean("contentTypesEnabled", true);
+		defaultContentType=enumValue(ContentType.class, prefs.getString("defaultContentType", instance.map(Instance::isIceshrimp).orElse(false) ? ContentType.MISSKEY_MARKDOWN.name() : ContentType.PLAIN.name()));
+		contentTypesEnabled=prefs.getBoolean("contentTypesEnabled", instance.map(i->!i.isIceshrimp()).orElse(false));
 		timelines=fromJson(prefs.getString("timelines", null), timelinesType, TimelineDefinition.getDefaultTimelines(session.getID()));
 		localOnlySupported=prefs.getBoolean("localOnlySupported", false);
 		glitchInstance=prefs.getBoolean("glitchInstance", false);
 		publishButtonText=prefs.getString("publishButtonText", null);
 		timelineReplyVisibility=prefs.getString("timelineReplyVisibility", null);
 		keepOnlyLatestNotification=prefs.getBoolean("keepOnlyLatestNotification", false);
-		emojiReactionsEnabled=prefs.getBoolean("emojiReactionsEnabled", session.getInstance().isPresent() && session.getInstance().get().isAkkoma());
+		emojiReactionsEnabled=prefs.getBoolean("emojiReactionsEnabled", instance.map(i->i.isAkkoma() || i.isIceshrimp()).orElse(false));
 		showEmojiReactions=ShowEmojiReactions.valueOf(prefs.getString("showEmojiReactions", ShowEmojiReactions.HIDE_EMPTY.name()));
 		color=prefs.contains("color") ? ColorPreference.valueOf(prefs.getString("color", null)) : null;
 		recentCustomEmoji=fromJson(prefs.getString("recentCustomEmoji", null), recentCustomEmojiType, new ArrayList<>());

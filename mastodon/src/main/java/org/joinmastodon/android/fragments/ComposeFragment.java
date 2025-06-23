@@ -461,7 +461,8 @@ public class ComposeFragment extends MastodonToolbarFragment implements OnBackPr
 		}
 
 		int typeIndex=contentType.ordinal();
-		contentTypePopup.getMenu().findItem(typeIndex).setChecked(true);
+		if(contentTypePopup.getMenu().findItem(typeIndex)!=null)
+			contentTypePopup.getMenu().findItem(typeIndex).setChecked(true);
 		contentTypeBtn.setSelected(typeIndex != ContentType.UNSPECIFIED.ordinal() && typeIndex != ContentType.PLAIN.ordinal());
 
 		autocompleteViewController=new ComposeAutocompleteViewController(getActivity(), accountID);
@@ -829,14 +830,18 @@ public class ComposeFragment extends MastodonToolbarFragment implements OnBackPr
 
 		publishButton=wrap.findViewById(R.id.publish_btn);
 		languageButton=wrap.findViewById(R.id.language_btn);
-		languageButton.setOnClickListener(v->showLanguageAlert());
-		languageButton.setOnLongClickListener(v->{
-			if(!getLocalPrefs().bottomEncoding){
-				getLocalPrefs().bottomEncoding=true;
-				getLocalPrefs().save();
-			}
-			return false;
-		});
+		if(instance.isIceshrimpJs())
+			languageButton.setVisibility(View.GONE);
+		else {
+			languageButton.setOnClickListener(v->showLanguageAlert());
+			languageButton.setOnLongClickListener(v->{
+				if(!getLocalPrefs().bottomEncoding){
+					getLocalPrefs().bottomEncoding=true;
+					getLocalPrefs().save();
+				}
+				return false;
+			});
+		}
 		publishButton.post(()->publishButton.setMinimumWidth(publishButton.getWidth()));
 
 		publishButton.setOnClickListener(v->{

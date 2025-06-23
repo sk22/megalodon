@@ -1020,7 +1020,7 @@ public class ProfileFragment extends LoaderFragment implements OnBackPressedList
 		else hidePrivateNote();
 		invalidateOptionsMenu();
 		actionButton.setVisibility(View.VISIBLE);
-		notifyButton.setVisibility(relationship.following ? View.VISIBLE : View.GONE);
+		notifyButton.setVisibility(relationship.following && !isInstanceIceshrimpJs() ? View.VISIBLE : View.GONE);
 		UiUtils.setRelationshipToActionButtonM3(relationship, actionButton);
 		actionProgress.setIndeterminateTintList(actionButton.getTextColors());
 		notifyProgress.setIndeterminateTintList(notifyButton.getTextColors());

@@ -285,23 +285,33 @@ public class FooterStatusDisplayItem extends StatusDisplayItem{
 				UiUtils.opacityIn(v);
 				Bundle args=new Bundle();
 				args.putString("account", item.accountID);
-				AccountSession accountSession=AccountSessionManager.getInstance().getAccount(item.accountID);
-				Instance instance=AccountSessionManager.getInstance().getInstanceInfo(accountSession.domain);
-				if(instance.pleroma == null){
+				Instance instance=AccountSessionManager.get(item.accountID).getInstance().get();
+				if(instance.isAkkoma() || instance.isIceshrimp()){
+					args.putParcelable("quote", Parcels.wrap(item.status));
+				}else{
 					StringBuilder prefilledText = new StringBuilder().append("\n\n");
 					String ownID = AccountSessionManager.getInstance().getAccount(item.accountID).self.id;
 					if (!item.status.account.id.equals(ownID)) prefilledText.append('@').append(item.status.account.acct).append(' ');
 					prefilledText.append(item.status.url);
 					args.putString("prefilledText", prefilledText.toString());
 					args.putInt("selectionStart", 0);
-				}else{
-					args.putParcelable("quote", Parcels.wrap(item.status));
 				}
 				Nav.go(item.parentFragment.getActivity(), ComposeFragment.class, args);
 			});
 
 			dialog.show();
 			return true;
+		}
+
+		public void onFavoriteClick() {
+			favorite.setSelected(item.status.favourited);
+			favorite.animate().scaleX(0.95f).scaleY(0.95f).setInterpolator(CubicBezierInterpolator.DEFAULT).setDuration(75).start();
+			UiUtils.opacityOut(favorite);
+			favorite.postDelayed(() -> {
+				favorite.animate().scaleX(1).scaleY(1).setInterpolator(CubicBezierInterpolator.DEFAULT).setDuration(150).start();
+				UiUtils.opacityIn(favorite);
+			}, 300);
+			bindText(favorites, item.status.favouritesCount);
 		}
 
 		private void onFavoriteClick(View v){

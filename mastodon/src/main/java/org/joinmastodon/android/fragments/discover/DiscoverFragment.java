@@ -1,6 +1,7 @@
 package org.joinmastodon.android.fragments.discover;
 
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -28,6 +29,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
+
+import java.util.Optional;
+
 import me.grishka.appkit.Nav;
 import me.grishka.appkit.fragments.AppKitFragment;
 import me.grishka.appkit.fragments.BaseRecyclerFragment;
@@ -57,6 +61,7 @@ public class DiscoverFragment extends AppKitFragment implements ScrollableToTop,
 	private String currentQuery;
 
 	private boolean disableDiscover;
+	private boolean isIceshrimp;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState){
@@ -75,13 +80,17 @@ public class DiscoverFragment extends AppKitFragment implements ScrollableToTop,
 		tabLayout=view.findViewById(R.id.tabbar);
 		pager=view.findViewById(R.id.pager);
 
-		tabViews=new FrameLayout[4];
+		Optional<Instance> instance=AccountSessionManager.get(accountID).getInstance();
+		disableDiscover=instance.map(Instance::isAkkoma).orElse(false);
+		isIceshrimp=instance.map(Instance::isIceshrimp).orElse(false);
+
+		tabViews=new FrameLayout[isIceshrimp ? 3 : 4];
 		for(int i=0;i<tabViews.length;i++){
 			FrameLayout tabView=new FrameLayout(getActivity());
 			tabView.setId(switch(i){
 				case 0 -> R.id.discover_hashtags;
 				case 1 -> R.id.discover_posts;
-				case 2 -> R.id.discover_news;
+				case 2 -> isIceshrimp ? R.id.discover_users : R.id.discover_news;
 				case 3 -> R.id.discover_users;
 				default -> throw new IllegalStateException("Unexpected value: "+i);
 			});
@@ -123,12 +132,15 @@ public class DiscoverFragment extends AppKitFragment implements ScrollableToTop,
 			accountsFragment=new DiscoverAccountsFragment();
 			accountsFragment.setArguments(args);
 
-			getChildFragmentManager().beginTransaction()
-					.add(R.id.discover_hashtags, hashtagsFragment)
-					.add(R.id.discover_posts, postsFragment)
-					.add(R.id.discover_news, newsFragment)
-					.add(R.id.discover_users, accountsFragment)
-					.commit();
+			FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+			transaction
+				.add(R.id.discover_hashtags, hashtagsFragment)
+				.add(R.id.discover_posts, postsFragment);
+			if(!isIceshrimp)
+				transaction.add(R.id.discover_news, newsFragment);
+			transaction
+				.add(R.id.discover_users, accountsFragment)
+				.commit();
 		}
 
 		tabLayoutMediator=new TabLayoutMediator(tabLayout, pager, new TabLayoutMediator.TabConfigurationStrategy(){
@@ -137,7 +149,7 @@ public class DiscoverFragment extends AppKitFragment implements ScrollableToTop,
 				tab.setText(switch(position){
 					case 0 -> R.string.hashtags;
 					case 1 -> R.string.posts;
-					case 2 -> R.string.news;
+					case 2 -> isIceshrimp ? R.string.for_you : R.string.news;
 					case 3 -> R.string.for_you;
 					default -> throw new IllegalStateException("Unexpected value: "+position);
 				});
@@ -157,7 +169,6 @@ public class DiscoverFragment extends AppKitFragment implements ScrollableToTop,
 			}
 		});
 
-		disableDiscover=AccountSessionManager.get(accountID).getInstance().map(Instance::isAkkoma).orElse(false);
 		searchView=view.findViewById(R.id.search_fragment);
 		if(searchFragment==null){
 			searchFragment=new SearchFragment();
@@ -254,7 +265,7 @@ public class DiscoverFragment extends AppKitFragment implements ScrollableToTop,
 		return switch(page){
 			case 0 -> hashtagsFragment;
 			case 1 -> postsFragment;
-			case 2 -> newsFragment;
+			case 2 -> isIceshrimp ? accountsFragment : newsFragment;
 			case 3 -> accountsFragment;
 			default -> throw new IllegalStateException("Unexpected value: "+page);
 		};

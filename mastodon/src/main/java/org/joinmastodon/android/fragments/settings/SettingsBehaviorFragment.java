@@ -45,7 +45,6 @@ public class SettingsBehaviorFragment extends BaseSettingsFragment<Void> impleme
 				languageResolver.from(s.preferences.postingDefaultLanguage).orElse(null);
 
 		List<ListItem<Void>> items = new ArrayList<>(List.of(
-				languageItem=new ListItem<>(getString(R.string.default_post_language), postLanguage!=null ? postLanguage.getDisplayName(getContext()) : null, R.drawable.ic_fluent_local_language_24_regular, this::onDefaultLanguageClick),
 				altTextItem=new CheckableListItem<>(R.string.settings_alt_text_reminders, 0, CheckableListItem.Style.SWITCH, GlobalUserPreferences.altTextReminders, R.drawable.ic_fluent_image_alt_text_24_regular, i->toggleCheckableItem(altTextItem)),
 				playGifsItem=new CheckableListItem<>(R.string.settings_gif, 0, CheckableListItem.Style.SWITCH, GlobalUserPreferences.playGifs, R.drawable.ic_fluent_gif_24_regular, i->toggleCheckableItem(playGifsItem)),
 				overlayMediaItem=new CheckableListItem<>(R.string.sk_settings_continues_playback, R.string.sk_settings_continues_playback_summary, CheckableListItem.Style.SWITCH, GlobalUserPreferences.overlayMedia, R.drawable.ic_fluent_play_circle_hint_24_regular, i->toggleCheckableItem(overlayMediaItem)),
@@ -61,6 +60,11 @@ public class SettingsBehaviorFragment extends BaseSettingsFragment<Void> impleme
 				showBoostsItem=new CheckableListItem<>(R.string.sk_settings_show_boosts, 0, CheckableListItem.Style.SWITCH, lp.showBoosts, R.drawable.ic_fluent_arrow_repeat_all_24_regular, i->toggleCheckableItem(showBoostsItem)),
 				showRepliesItem=new CheckableListItem<>(R.string.sk_settings_show_replies, 0, CheckableListItem.Style.SWITCH, lp.showReplies, R.drawable.ic_fluent_arrow_reply_24_regular, i->toggleCheckableItem(showRepliesItem))
 		));
+
+		if(!isInstanceIceshrimpJs()) items.add(
+				0,
+				languageItem=new ListItem<>(getString(R.string.default_post_language), postLanguage!=null ? postLanguage.getDisplayName(getContext()) : null, R.drawable.ic_fluent_local_language_24_regular, this::onDefaultLanguageClick)
+		);
 
 		if(isInstanceAkkoma()) items.add(
 				replyVisibilityItem=new ListItem<>(R.string.sk_settings_reply_visibility, getReplyVisibilityString(), R.drawable.ic_fluent_chat_24_regular, this::onReplyVisibilityClick)

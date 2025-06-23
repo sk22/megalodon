@@ -289,7 +289,7 @@ public class ThreadFragment extends StatusListFragment implements ProvidesAssist
 					// descendant neighbor
 					Optional
 							.ofNullable(count > index + 1 ? statuses.get(index + 1) : null)
-							.filter(s -> s.inReplyToId.equals(current.id))
+							.filter(s -> s.inReplyToId!=null && s.inReplyToId.equals(current.id)) // inReplyToId is null for quote posts on Iceshrimp
 							.orElse(null),
 					// ancestoring neighbor
 					Optional.ofNullable(index > 0 ? ancestry.get(index - 1) : null)
